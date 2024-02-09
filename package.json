@@ -1,0 +1,39 @@
+{
+  "name": "rehype-lilypond",
+  "version": "0.1.0",
+  "description": "A Rehype plugin to render lilypond music notation",
+  "keywords": [
+    "rehype",
+    "remark",
+    "plugin",
+    "mdx",
+    "lilypond",
+    "music"
+  ],
+  "homepage": "https://github.com/jorins/rehype-lilypond",
+  "bugs": "https://github.com/jorins/rehype-lilypond/issues",
+  "license": "MPL-2.0",
+  "author": {
+    "name": "Jorin",
+    "url": "https://github.com/jorins"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jorins/rehype-lilypond"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier .",
+    "format:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "husky": "^9.0.10",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
+  }
+}
