@@ -1,18 +1,18 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "rehype-lilypond",
+  "name": "remark-lilypond",
   "version": "0.1.0",
-  "description": "A Rehype plugin to render lilypond music notation",
+  "description": "A Remark plugin to render lilypond music notation",
   "keywords": [
-    "rehype",
     "remark",
+    "rehype",
     "plugin",
     "mdx",
     "lilypond",
     "music"
   ],
-  "homepage": "https://github.com/jorins/rehype-lilypond",
-  "bugs": "https://github.com/jorins/rehype-lilypond/issues",
+  "homepage": "https://github.com/jorins/remark-lilypond",
+  "bugs": "https://github.com/jorins/remark-lilypond/issues",
   "license": "MPL-2.0",
   "author": {
     "name": "Jorin",
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jorins/rehype-lilypond"
+    "url": "https://github.com/jorins/remark-lilypond"
   },
   "scripts": {
     "build": "tsc",

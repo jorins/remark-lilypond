@@ -1,3 +1,3 @@
-# rehype-lilypond
+# remark-lilypond
 
-A Rehype plugin to render lilypond music notation
+A Remark plugin to render Lilypond music notation
