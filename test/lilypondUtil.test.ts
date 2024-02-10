@@ -7,14 +7,14 @@ import { music, binary, opts, file } from './values'
 
 describe('Lilypond utilities', () => {
   describe(wrapMusic, () => {
-    it('wraps in a score without outputs when no format is given', () => {
+    it('wraps in a score without outputs when no format is given MIDI is not requested', () => {
       const res = wrapMusic(music, { ...opts, formats: [], midi: false })
       expect(res).toEqual(
         multiline(`\\version "2.24"`, `\\score {`, `  { ${music} }`, `}`),
       )
     })
 
-    it('wraps in a score with only \\layout when PDF is the only given format', () => {
+    it('wraps in a score with only \\layout when PDF is the only given format and MIDI is not requested', () => {
       const res = wrapMusic(music, { ...opts, formats: ['pdf'], midi: false })
       expect(res).toEqual(
         multiline(
@@ -27,7 +27,7 @@ describe('Lilypond utilities', () => {
       )
     })
 
-    it('wraps in a score with only \\layout when formats are PDF and PNG', () => {
+    it('wraps in a score with only \\layout when formats are PDF and PNG and MIDI is not requested', () => {
       const res = wrapMusic(music, {
         ...opts,
         formats: ['pdf', 'png'],
@@ -44,7 +44,7 @@ describe('Lilypond utilities', () => {
       )
     })
 
-    it('wraps in a score with only \\midi when no graphical format is given and MIDI specified', () => {
+    it('wraps in a score with only \\midi when no graphical format is given and MIDI is requested', () => {
       const res = wrapMusic(music, { ...opts, formats: [], midi: true })
       expect(res).toEqual(
         multiline(
@@ -57,7 +57,7 @@ describe('Lilypond utilities', () => {
       )
     })
 
-    it('wraps in a score with both \\layout and \\midi when formats are PDF and MIDI', () => {
+    it('wraps in a score with both \\layout and \\midi when PDF is the only given format and MIDI is requested', () => {
       const res = wrapMusic(music, { ...opts, formats: ['pdf'], midi: true })
       expect(res).toEqual(
         multiline(
@@ -197,7 +197,7 @@ describe('Lilypond utilities', () => {
     ]
 
     it.each(tests)(
-      'generates expected command line for formats $name',
+      'generates expected command line for $name',
       ({ opts, file, expected }) => {
         expect(computeArgs(opts, file)).toEqual(expected)
       },
