@@ -20,14 +20,14 @@ const exec = promisify(childProcess.exec)
  * Lilypond's possible output formats, as per
  * [documentation](https://lilypond.org/doc/v2.24/Documentation/notation/alternative-output-formats)
  *
- * PS and EPS are not supported.
+ * `ps` and `eps` are not supported.
  */
 export type OutputFormat = 'eps' | 'pdf' | 'png' | 'ps' | 'svg'
 
 /**
  * Lilypond opts with all options set. For internal use.
  */
-export type StrictLilypondOpts<Format extends OutputFormat = OutputFormat> = {
+export type StrictLilypondOpts = {
   /**
    * Lilypond binary to invoke
    *
@@ -36,49 +36,70 @@ export type StrictLilypondOpts<Format extends OutputFormat = OutputFormat> = {
   binary: string
 
   /**
-   * Lilypond version to use. This value will be written to the `\\version` at
-   * the top of the score.
+   * Lilypond document version to use. This value will be written to the
+   * `\\version` at the top of the score if `wrap` is true.
    *
    * @default 2.24
    */
   version: string
 
   /**
-   * List of formats to render. SVG cannot be used along with other graphical formats, and
-   * EPS is presently not allowed.
+   * List of formats to render. `svg` cannot be used along with other formats,
+   * and `ps` and `eps` are not presently supported.
    *
-   * @default ['svg']
+   * @default ['pdf']
    */
-  formats: Format[]
+  formats: OutputFormat[]
 
   /**
    * Whether to crop the output.
    *
-   * @default true
+   * @default false
    */
   crop: boolean
 
   /**
-   * DPI of PNG output. If null, let Lilypond determine the default (101 as of writing).
+   * DPI of `png` output. If `null`, let Lilypond determine the default (101 as
+   * of writing).
    *
    * @default null
    */
   dpi: number | null
 
   /**
-   * Whether to output MIDI
+   * Whether to add a `\midi` block to the score if `wrap` is set.
+   *
+   * @default false
+   */
+  midi: boolean
+
+  /**
+   * Whether to automatically wrap music expressions in a complete score.
+   * If `true`, the input is automatically added to the template
+   *
+   * ```lilypond
+   * \version ${version}
+   * \score {
+   *   { ${input} }
+   *   \layout { }
+   *   \midi { }
+   * }
+   * ```
+   *
+   * If `false`, your input has to be a complete score. This means that you need
+   * to manually enter a version and make sure that your desired output files
+   * are properly created. See [Lilypond
+   * docs](https://lilypond.org/doc/v2.24/Documentation/notation/the-midi-block)
    *
    * @default true
    */
-  midi: boolean
+  wrap: boolean
 }
 
 /**
  * Options for invoking lilypond. For external use.
  */
-export type LilypondOpts<Format extends OutputFormat = OutputFormat> = Partial<
-  StrictLilypondOpts<Format>
->
+export type LilypondOpts = Partial<StrictLilypondOpts>
 
 /**
  * The output files of a lilypond invocation, as a record of filetypes and
@@ -92,15 +113,19 @@ export type LilypondResults = {
 }
 
 /**
- * Default opts
+ * Default Lilypond options.
+ *
+ * These choices intend to reflect 'standard' lilypond usage. Some will be
+ * overridden by the plugin options.
  */
 const defaults: StrictLilypondOpts = {
   binary: os.type() === 'Windows_NT' ? 'lilypond.exe' : '/usr/bin/env lilypond',
   version: '2.24',
-  formats: ['svg'],
-  crop: true,
+  formats: ['pdf'],
+  crop: false,
   dpi: null,
-  midi: true,
+  midi: false,
+  wrap: false,
 }
 
 /**
@@ -119,7 +144,8 @@ export async function invokeLilypond(
 
   validateOptions(fullOpts)
 
-  const score = wrapMusic(music, fullOpts)
+  const score = fullOpts.wrap === true ? wrapMusic(music, fullOpts) : music
+
   const tempDir = await mkdtemp(join(os.tmpdir(), 'lilypond-'))
   const inputPath = join(tempDir, 'score.ly')
   await writeFile(inputPath, score)
