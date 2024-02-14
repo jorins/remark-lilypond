@@ -3,9 +3,36 @@ import type { Root, Parent, Code } from 'mdast'
 import type { LilypondOpts, OutputFormat } from './invokeLilypond'
 
 import { visit } from 'unist-util-visit'
-import { Lilypond } from './component'
 import { invokeLilypond } from './invokeLilypond'
 import { parseMeta } from './parseMeta'
+import { svgToHast } from './svgToHast'
+import { Program } from 'estree'
+
+declare module 'mdast' {
+  export interface RootContentMap {
+    mdxJsxFlowElement: MdxJsxFlowElement
+  }
+}
+
+export interface MdxJsxAttributeValueExpression {
+  type: 'mdxJsxAttributeValueExpression'
+  value: string
+  data: {
+    estree: Program
+  }
+}
+
+export interface MdxJsxAttribute {
+  type: 'mdxJsxAttribute'
+  name: string
+  value: MdxJsxAttributeValueExpression | string
+}
+
+export interface MdxJsxFlowElement extends Parent {
+  type: 'mdxJsxFlowElement'
+  name: string
+  attributes?: MdxJsxAttribute[]
+}
 
 /**
  * Method of rendering
@@ -44,7 +71,7 @@ export const remarkLilypond: Plugin<
   [RemarkLilypondConfig | undefined],
   Root
 > = pluginOpts => {
-  const transformer: Transformer<Root, Root> = async (ast) => {
+  const transformer: Transformer<Root, Root> = async ast => {
     type Target = {
       node: Code
       index: number
@@ -52,27 +79,27 @@ export const remarkLilypond: Plugin<
     }
     const targets: Target[] = []
 
-    visit(ast, { type: 'code', lang: 'lilypond' }, (
-      node: Code,
-      index: number | undefined,
-      parent: Parent | undefined,
-    ) => {
-      if (index === undefined) {
-        throw new Error('Node has no index')
-      }
+    visit(
+      ast,
+      { type: 'code', lang: 'lilypond' },
+      (node: Code, index: number | undefined, parent: Parent | undefined) => {
+        if (index === undefined) {
+          throw new Error('Node has no index')
+        }
 
-      if (parent === undefined) {
-        throw new Error('Node has no parent')
-      }
+        if (parent === undefined) {
+          throw new Error('Node has no parent')
+        }
 
-      if (! ('children' in parent)) {
-        throw new Error('Parent has no children')
-      }
+        if (!('children' in parent)) {
+          throw new Error('Parent has no children')
+        }
 
-      targets.push({node, index, parent})
-    })
+        targets.push({ node, index, parent })
+      },
+    )
 
-    for (const {node, index, parent} of targets) {
+    for (const { node, index, parent } of targets) {
       // Build per-snippet config
       const parsedMeta = parseMeta(node.meta ?? '')
       const snippetConfig: RemarkLilypondConfig = {
@@ -98,27 +125,25 @@ export const remarkLilypond: Plugin<
           `Snippet with strategy ${snippetConfig.strategy} gave empty output binary for format ${format}`,
         )
       }
-
-      console.log({node, res})
       if (snippetConfig.strategy === 'inline-svg') {
-        parent.children[index] = {
-          type: 'html',
-          value: Lilypond({
-            data: outputBinary.toString(),
-            displayAs: 'inline'
-          })
-        }
+        svgToHast(outputBinary)
+        parent.children[index] = svgToHast(outputBinary)
       } else {
-        const uri = `data:image/${format};base64,${outputBinary.toString('base64')}`
+        const uri = `data:image/${format === 'svg' ? 'svg+xml' : format};base64,${outputBinary.toString('base64')}`
         parent.children[index] = {
-          type: 'image',
-          url: uri,
-          data: { unoptimized: true }
+          type: 'mdxJsxFlowElement',
+          name: 'img',
+          attributes: [
+            {
+              type: 'mdxJsxAttribute',
+              name: 'src',
+              value: uri,
+            },
+          ],
+          children: [],
         }
       }
     }
-
-    console.log(JSON.stringify(ast, undefined, 2))
     return ast
   }
 
