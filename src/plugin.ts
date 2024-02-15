@@ -64,6 +64,15 @@ const defaultConfig: RemarkLilypondConfig = {
   dpi: 72,
 }
 
+const mimeTypeMap = {
+  ps: 'application/postscript',
+  pdf: 'application/pdf',
+  png: 'image/png',
+  svg: 'image/svg+xml'
+} as const satisfies {
+  [key in OutputFormat]: string;
+};
+
 /**
  * The remark lilypond plugin
  */
@@ -108,28 +117,24 @@ export const remarkLilypond: Plugin<
         ...parsedMeta,
       }
 
-      const format: OutputFormat =
-        snippetConfig.strategy === 'img-png' ? 'png' : 'svg'
+      const formats = (snippetConfig.strategy === 'img-png' ? ['png'] : ['svg']) satisfies LilypondOpts['formats'];
+      const [format] = formats;
 
       // Derive lilypond opts from plugin opts
-      const lilypondOpts: LilypondOpts = {
+      const lilypondOpts: LilypondOpts & {
+        formats: typeof formats
+      } = {
         ...snippetConfig,
-        formats: [format],
+        formats,
       }
 
       // Build lilypond
       const res = await invokeLilypond(node.value, lilypondOpts)
       const outputBinary = res.outputs[format]
-      if (outputBinary === undefined) {
-        throw new Error(
-          `Snippet with strategy ${snippetConfig.strategy} gave empty output binary for format ${format}`,
-        )
-      }
       if (snippetConfig.strategy === 'inline-svg') {
-        svgToHast(outputBinary)
         parent.children[index] = svgToHast(outputBinary)
       } else {
-        const uri = `data:image/${format === 'svg' ? 'svg+xml' : format};base64,${outputBinary.toString('base64')}`
+        const uri = `data:${mimeTypeMap[format]};base64,${outputBinary.toString('base64')}`
         parent.children[index] = {
           type: 'mdxJsxFlowElement',
           name: 'img',
