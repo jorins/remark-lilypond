@@ -4,25 +4,32 @@
  */
 
 import * as childProcess from 'node:child_process'
-import * as os from 'node:os'
+import os from 'os'
 
-import { writeFile, mkdtemp } from 'node:fs/promises'
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
-import { promisify } from 'node:util'
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import path from 'node:path'
 
 import { wrapMusic, computeArgs, validateOptions } from './lilypondUtil'
 import { fromEntries } from './util'
 
-const exec = promisify(childProcess.exec)
-
 /**
- * Lilypond's possible output formats, as per
- * [documentation](https://lilypond.org/doc/v2.24/Documentation/notation/alternative-output-formats)
+ * The format of the (main) output file or files. Possible values for format are ps, pdf, png or svg.
  *
- * `ps` and `eps` are not supported.
+ * SVG internally uses a specific backend, and therefore cannot be obtained in the same run as other formats; using -fsvg or --svg is actually equivalent to using the -dbackend=svg option. See Advanced command line options for LilyPond.
+ *
+ * @see {@link https://lilypond.org/doc/v2.24/Documentation/usage/command_002dline-usage#basic-command-line-options-for-lilypond | Lilypond Docs}
  */
-export type OutputFormat = 'eps' | 'pdf' | 'png' | 'ps' | 'svg'
+export const outputFormats = ['ps', 'pdf', 'png', 'svg'] as const
+/**
+ * The format of the (main) output file or files. Possible values for format are ps, pdf, png or svg.
+ *
+ * SVG internally uses a specific backend, and therefore cannot be obtained in the same run as other formats; using -fsvg or --svg is actually equivalent to using the -dbackend=svg option. See Advanced command line options for LilyPond.
+ *
+ * @see {@link https://lilypond.org/doc/v2.24/Documentation/usage/command_002dline-usage#basic-command-line-options-for-lilypond | Lilypond Docs}
+ */
+export type OutputFormat = (typeof outputFormats)[number]
+
+export const USE_ENV = Symbol('USE_ENV')
 
 /**
  * Lilypond opts with all options set. For internal use.
@@ -31,9 +38,11 @@ export type StrictLilypondOpts = {
   /**
    * Lilypond binary to invoke
    *
-   * @default `lilypond.exe` for Windows; otherwise `/usr/bin/env lilypond`
+   * Default to {@link USE_ENV} for POSIX systems, and `lilypond.exe` on Windows systems.
+   *
+   * @default `lilypond.exe` | USE_ENV
    */
-  binary: string
+  binary: string | typeof USE_ENV
 
   /**
    * Lilypond document version to use. This value will be written to the
@@ -108,7 +117,7 @@ export type LilypondOpts = Partial<StrictLilypondOpts>
 export type LilypondResults = {
   stdout: string
   stderr: string
-  outputs: Partial<Record<OutputFormat, Buffer>>
+  outputs: Partial<Record<OutputFormat | `cropped.${OutputFormat}`, Buffer>>
   midi?: Buffer
 }
 
@@ -118,58 +127,105 @@ export type LilypondResults = {
  * These choices intend to reflect 'standard' lilypond usage. Some will be
  * overridden by the plugin options.
  */
-const defaults: StrictLilypondOpts = {
-  binary: os.type() === 'Windows_NT' ? 'lilypond.exe' : '/usr/bin/env lilypond',
-  version: '2.24',
+const defaults = {
+  binary: process.platform === 'win32' ? 'lilypond.exe' : USE_ENV,
+  version: '2.22.1',
   formats: ['pdf'],
   crop: false,
   dpi: null,
   midi: false,
   wrap: false,
-}
+} as const satisfies StrictLilypondOpts
 
 /**
  * Invoke lilypond.
  *
  * @return The resulting outputs
  */
+export async function invokeLilypond<Formats extends readonly OutputFormat[]>(
+  music: string,
+  opts?: LilypondOpts & { formats: Formats },
+): Promise<
+  LilypondResults & {
+    outputs: Record<Formats[number], Buffer>
+  }
+>
+export async function invokeLilypond(
+  music: string,
+  opts?: Omit<LilypondOpts, 'formats'> & { formats?: never },
+): Promise<
+  LilypondResults & {
+    outputs: Record<(typeof defaults)['formats'][number], Buffer>
+  }
+>
+export async function invokeLilypond(
+  music: string,
+  opts?: LilypondOpts,
+): Promise<LilypondResults>
 export async function invokeLilypond(
   music: string,
   opts?: LilypondOpts,
 ): Promise<LilypondResults> {
-  const fullOpts = {
+  const fullOpts: StrictLilypondOpts = {
     ...defaults,
     ...(opts ?? {}),
   }
 
   validateOptions(fullOpts)
 
-  const score = fullOpts.wrap === true ? wrapMusic(music, fullOpts) : music
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), 'lilypond-'))
+  try {
+    const args: readonly string[] =
+      fullOpts.binary === USE_ENV
+        ? ['lilypond', ...computeArgs(fullOpts, path.join(tempDir, 'output'))]
+        : computeArgs(fullOpts, path.join(tempDir, 'output'))
+    const { stdout, stderr } = await new Promise<{
+      stdout: string
+      stderr: string
+    }>((resolve, reject) => {
+      const cp = childProcess.execFile(
+        fullOpts.binary === USE_ENV ? '/usr/bin/env' : fullOpts.binary,
+        args,
+        {},
+        (err, stdout, stderr) => {
+          if (err) {
+            Object.assign(err, { stdout, stderr })
+            reject(err)
+          }
+          resolve({
+            stdout,
+            stderr,
+          })
+        },
+      )
+      cp.stdin?.end(
+        fullOpts.wrap === true ? wrapMusic(music, fullOpts) : music,
+        'utf-8',
+      )
+    })
 
-  const tempDir = await mkdtemp(join(os.tmpdir(), 'lilypond-'))
-  const inputPath = join(tempDir, 'score.ly')
-  await writeFile(inputPath, score)
+    const outputs = await Promise.all(
+      fullOpts.formats.map(async type => {
+        return [
+          type,
+          await readFile(path.join(tempDir, `output.${type}`)),
+        ] as const
+      }),
+    ).then(entries => fromEntries(entries))
 
-  const commandLine = computeArgs(fullOpts, inputPath)
-  const { stdout, stderr } = await exec(commandLine, { cwd: tempDir })
-
-  const cropSuffix = fullOpts.crop ? 'cropped.' : ''
-
-  const outputs: Record<OutputFormat, Buffer> = fromEntries(
-    fullOpts.formats.map(format => [
-      format,
-      readFileSync(join(tempDir, `score.${cropSuffix}${format}`)),
-    ]),
-  )
-
-  const midi = fullOpts.midi
-    ? readFileSync(join(tempDir, `score.midi`))
-    : undefined
-
-  return {
-    stdout,
-    stderr,
-    outputs,
-    midi,
+    return {
+      stdout,
+      stderr,
+      outputs,
+      ...(fullOpts.midi ? {midi: await readFile(path.join(tempDir, 'output.midi'))} : null),
+    }
+  } finally {
+    // Sanity check for tempDir
+    // so we don't accidentally recursively delete root...
+    if (tempDir.length > 6) {
+      await rm(tempDir, {
+        recursive: true,
+      })
+    }
   }
 }

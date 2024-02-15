@@ -46,23 +46,13 @@ export function validateOptions(opts: StrictLilypondOpts): void {
       `Cannot generate svg at the same time as other graphical formats (asked to generate ${formatsStr})`,
     )
   }
-
-  // Due to ps and eps using their extensions somewhat interchangably and the
-  // format not being very interesting to me, they're not supported presently.
-  if (opts.formats.includes('ps')) {
-    throw new Error('ps format is not supported')
-  }
-
-  if (opts.formats.includes('eps')) {
-    throw new Error('eps format is not supported')
-  }
 }
 
 /**
  * Generate the full command to invoke lilypond with.
  */
-export function computeArgs(opts: StrictLilypondOpts, file: string): string {
-  const args = [opts.binary]
+export function computeArgs(opts: StrictLilypondOpts, outPath: string): string[] {
+  const args = []
 
   for (const format of opts.formats) {
     args.push(`--format=${format}`)
@@ -76,8 +66,11 @@ export function computeArgs(opts: StrictLilypondOpts, file: string): string {
     args.push(`--define-default=resolution=${opts.dpi}`)
   }
 
+  args.push(`--output=${outPath}`)
+
   args.push('--define-default=no-point-and-click')
 
-  args.push(file)
-  return args.join(' ')
+  args.push('-')
+
+  return args;
 }
