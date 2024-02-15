@@ -28,13 +28,15 @@
     "dist/*"
   ],
   "scripts": {
-    "build": "tsup src/index.ts",
-    "watch": "tsup src/index.ts --watch",
+    "build": "tsup",
+    "build:watch": "tsup --watch",
     "test": "jest",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "format": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "format:fix": "prettier --write .",
+    "docs": "typedoc",
+    "docs:watch": "typedoc --watch"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
