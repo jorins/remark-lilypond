@@ -219,7 +219,7 @@ export class InvalidValueError extends NamedError {
       )
     } else {
       super(`Missing property ${mkPathString(path)}, expected ${expectedValue}`)
-      console.log(this.stack);
+      console.log(this.stack)
     }
     this.#path = path
   }
@@ -302,7 +302,7 @@ export function assertType<Type extends TypeDef>(
     if (type(o, ErrorCtors, path) === false) {
       throw new InvalidTypeErrorCtor(path, type, true, o)
     }
-    return;
+    return
   }
   if (isValidType(type)) {
     if ((typeGuards[type] as (typeof typeGuards)[TypeName])(o)) return
@@ -336,7 +336,7 @@ export function assertType<Type extends TypeDef>(
       ...Object.getOwnPropertyNames(type),
     ] as const
     if ((typeof o !== 'object' && typeof o !== 'function') || o == null) {
-      throw new InvalidTypeError(path, type, true, o);
+      throw new InvalidTypeError(path, type, true, o)
     }
     props.forEach(key => {
       if (key in o) {
@@ -377,10 +377,13 @@ export function isType<Type extends TypeDef>(
     try {
       return type(o, { InvalidValueError, InvalidTypeError }, path) !== false
     } catch (err) {
-      if (typeof err === 'object' && (err instanceof InvalidValueError || err instanceof InvalidTypeError)) {
-        return false;
+      if (
+        typeof err === 'object' &&
+        (err instanceof InvalidValueError || err instanceof InvalidTypeError)
+      ) {
+        return false
       }
-      throw err;
+      throw err
     }
   }
   if (isValidType(type)) {
@@ -396,18 +399,22 @@ export function isType<Type extends TypeDef>(
         >(this, o, subType, path),
       )
     } else if (INTERSECTION in type && type[INTERSECTION] === true) {
-      return type.every(subType => isType.call<
-        unknown,
-        [o: unknown, type: TypeDef, path?: PropertyKey[]],
-        void
-      >(this, o, subType, path))
+      return type.every(subType =>
+        isType.call<
+          unknown,
+          [o: unknown, type: TypeDef, path?: PropertyKey[]],
+          void
+        >(this, o, subType, path),
+      )
     } else {
       const [nestedType] = type
-      return type.every((value, i) => isType.call<
-      unknown,
-      [o: unknown, type: TypeDef, path?: PropertyKey[]],
-      void
-    >(this, value, nestedType, [...path, i]))
+      return type.every((value, i) =>
+        isType.call<
+          unknown,
+          [o: unknown, type: TypeDef, path?: PropertyKey[]],
+          void
+        >(this, value, nestedType, [...path, i]),
+      )
     }
   } else if (type && typeof type === 'object') {
     const props = [
@@ -415,7 +422,11 @@ export function isType<Type extends TypeDef>(
       ...Object.getOwnPropertyNames(type),
     ] as const
     return props.every(key => {
-      if ((typeof o === 'object' || typeof o === 'function') && o != null && key in o) {
+      if (
+        (typeof o === 'object' || typeof o === 'function') &&
+        o != null &&
+        key in o
+      ) {
         return isType.call<
           unknown,
           [o: unknown, type: TypeDef, path?: PropertyKey[]],
@@ -425,7 +436,7 @@ export function isType<Type extends TypeDef>(
       return false
     })
   } else if (typeof type === 'symbol') {
-    return o === type;
+    return o === type
   }
   return false
 }

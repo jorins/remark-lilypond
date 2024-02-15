@@ -9,16 +9,16 @@ function patchAttributeName(tagName: string, attrName: string): string {
     case 'xlink:href':
       return 'href'
   }
-  let patchedName = attrName;
+  let patchedName = attrName
   {
-    const [first, ...colonSegments] = attrName.split(':');
-    patchedName = `${first}${colonSegments.map(s => `${s.slice(0,1).toUpperCase()}${s.slice(1)}`).join(':')}`;
+    const [first, ...colonSegments] = attrName.split(':')
+    patchedName = `${first}${colonSegments.map(s => `${s.slice(0, 1).toUpperCase()}${s.slice(1)}`).join(':')}`
   }
   {
-    const [first, ...dashSegments] = attrName.split('-');
-    patchedName = `${first}${dashSegments.map(s => `${s.slice(0,1).toUpperCase()}${s.slice(1)}`).join('-')}`;
+    const [first, ...dashSegments] = attrName.split('-')
+    patchedName = `${first}${dashSegments.map(s => `${s.slice(0, 1).toUpperCase()}${s.slice(1)}`).join('-')}`
   }
-  return patchedName;
+  return patchedName
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,11 +53,11 @@ function elementToNode(name: string, el: any): RootContent {
         name: patchAttributeName(name, key.slice(2)),
         value: String(value),
       }
-    });
+    })
   const children = Object.entries(el)
     .filter(([key]) => !key.startsWith('@_'))
     .flatMap(([key, value]) => {
-      if (Array.isArray(value)) return value.map(v => elementToNode(key, v));
+      if (Array.isArray(value)) return value.map(v => elementToNode(key, v))
       return elementToNode(key, value)
     })
   return {
@@ -77,5 +77,5 @@ export function svgToHast(svgData: string | Buffer): RootContent {
   if (!jObj.svg || typeof jObj.svg !== 'object')
     throw new Error('Could not find root svg element')
 
-  return elementToNode('svg', jObj.svg);
+  return elementToNode('svg', jObj.svg)
 }

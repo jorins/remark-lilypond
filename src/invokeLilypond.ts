@@ -105,15 +105,19 @@ export type StrictLilypondOpts = {
   readonly wrap: boolean
 }
 
-type Mutable<T> = T extends Readonly<Record<string | symbol | number, never>> | readonly unknown[] ? {
-  -readonly [key in keyof T]: Mutable<T[key]>
-} : T;
+type Mutable<T> = T extends
+  | Readonly<Record<string | symbol | number, never>>
+  | readonly unknown[]
+  ? {
+      -readonly [key in keyof T]: Mutable<T[key]>
+    }
+  : T
 
 /**
  * Options for invoking lilypond. For external use.
  */
 export type LilypondOpts = {
-  -readonly [key in keyof StrictLilypondOpts]?: Mutable<StrictLilypondOpts[key]>;
+  -readonly [key in keyof StrictLilypondOpts]?: Mutable<StrictLilypondOpts[key]>
 }
 
 /**
@@ -148,7 +152,9 @@ const defaults: StrictLilypondOpts = {
  *
  * @return The resulting outputs
  */
-export async function invokeLilypond<Formats extends Readonly<StrictLilypondOpts['formats']>>(
+export async function invokeLilypond<
+  Formats extends Readonly<StrictLilypondOpts['formats']>,
+>(
   music: string,
   opts?: LilypondOpts & { formats: Formats },
 ): Promise<
@@ -215,7 +221,9 @@ export async function invokeLilypond(
       stdout,
       stderr,
       outputs,
-      ...(fullOpts.midi ? {midi: await readFile(path.join(tempDir, 'output.midi'))} : null),
+      ...(fullOpts.midi
+        ? { midi: await readFile(path.join(tempDir, 'output.midi')) }
+        : null),
     }
   } finally {
     // Sanity check for tempDir

@@ -3,7 +3,12 @@
  * Utilities surrounding lilypond
  */
 
-import { USE_ENV, type StrictLilypondOpts, outputFormats, OutputFormat } from './invokeLilypond'
+import {
+  USE_ENV,
+  type StrictLilypondOpts,
+  outputFormats,
+  OutputFormat,
+} from './invokeLilypond'
 import {
   ErrorCtors,
   InvalidValueError,
@@ -50,19 +55,48 @@ export class InvalidOptionsError extends InvalidValueError {
   }
 }
 
-function assertOutputFormatsArray(formats: unknown, { InvalidValueError }: ErrorCtors, path: PropertyKey[]): asserts formats is OutputFormat[] {
+function assertOutputFormatsArray(
+  formats: unknown,
+  { InvalidValueError }: ErrorCtors,
+  path: PropertyKey[],
+): asserts formats is OutputFormat[] {
   if (!isType(formats, ['string']))
-    throw new InvalidValueError(path, `["svg"] | array<${outputFormats.filter(f => f !== 'svg').map(f => JSON.stringify(f)).join(' | ')}>`, getTypeName(formats));
-  const invalidIndex = formats.findIndex(f => !(outputFormats as readonly string[]).includes(f));
-  if (invalidIndex > -1) throw new InvalidValueError([...path, invalidIndex], outputFormats.map(f => JSON.stringify(f)).join(' | '), JSON.stringify(formats[invalidIndex]));
+    throw new InvalidValueError(
+      path,
+      `["svg"] | array<${outputFormats
+        .filter(f => f !== 'svg')
+        .map(f => JSON.stringify(f))
+        .join(' | ')}>`,
+      getTypeName(formats),
+    )
+  const invalidIndex = formats.findIndex(
+    f => !(outputFormats as readonly string[]).includes(f),
+  )
+  if (invalidIndex > -1)
+    throw new InvalidValueError(
+      [...path, invalidIndex],
+      outputFormats.map(f => JSON.stringify(f)).join(' | '),
+      JSON.stringify(formats[invalidIndex]),
+    )
 }
 
-function assertValidFormats(formats: unknown, ErrorCtors: ErrorCtors, path: PropertyKey[]): asserts formats is StrictLilypondOpts['formats'] {
-  assertOutputFormatsArray(formats, ErrorCtors, path);
+function assertValidFormats(
+  formats: unknown,
+  ErrorCtors: ErrorCtors,
+  path: PropertyKey[],
+): asserts formats is StrictLilypondOpts['formats'] {
+  assertOutputFormatsArray(formats, ErrorCtors, path)
   // SVG cannot be generated along with other formats, see
   // https://lilypond.org/doc/v2.24/Documentation/usage/command_002dline-usage#basic-command-line-options-for-lilypond
   if (formats.includes('svg') && formats.length > 1) {
-    throw new ErrorCtors.InvalidValueError(path, `["svg"] | array<${outputFormats.filter(f => f !== 'svg').map(f => JSON.stringify(f)).join(' | ')}>`, `array<${[...new Set(formats)].map(s => JSON.stringify(s)).join(' | ')}>`);
+    throw new ErrorCtors.InvalidValueError(
+      path,
+      `["svg"] | array<${outputFormats
+        .filter(f => f !== 'svg')
+        .map(f => JSON.stringify(f))
+        .join(' | ')}>`,
+      `array<${[...new Set(formats)].map(s => JSON.stringify(s)).join(' | ')}>`,
+    )
   }
 }
 
@@ -83,9 +117,12 @@ export function validateOptions(
       midi: 'boolean',
       wrap: 'boolean',
     },
-    { InvalidValueError: InvalidOptionsError, InvalidTypeError: InvalidOptionsError.TypeError },
+    {
+      InvalidValueError: InvalidOptionsError,
+      InvalidTypeError: InvalidOptionsError.TypeError,
+    },
   )
-  opts satisfies StrictLilypondOpts;
+  opts satisfies StrictLilypondOpts
 }
 
 /**

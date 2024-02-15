@@ -68,10 +68,10 @@ const mimeTypeMap = {
   ps: 'application/postscript',
   pdf: 'application/pdf',
   png: 'image/png',
-  svg: 'image/svg+xml'
+  svg: 'image/svg+xml',
 } as const satisfies {
-  [key in OutputFormat]: string;
-};
+  [key in OutputFormat]: string
+}
 
 /**
  * The remark lilypond plugin
@@ -117,8 +117,10 @@ export const remarkLilypond: Plugin<
         ...parsedMeta,
       }
 
-      const formats = (snippetConfig.strategy === 'img-png' ? ['png'] : ['svg']) satisfies LilypondOpts['formats'];
-      const [format] = formats;
+      const formats = (
+        snippetConfig.strategy === 'img-png' ? ['png'] : ['svg']
+      ) satisfies LilypondOpts['formats']
+      const [format] = formats
 
       // Derive lilypond opts from plugin opts
       const lilypondOpts: LilypondOpts & {

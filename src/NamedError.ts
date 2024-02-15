@@ -25,7 +25,7 @@ const NamedError: ErrorConstructor = Object.setPrototypeOf(function NamedError(
     instance.name = constructor.name
   }
   return instance
-}, Error);
-(NamedError as { prototype: Error }).prototype = Error.prototype;
+}, Error)
+;(NamedError as { prototype: Error }).prototype = Error.prototype
 
 export default NamedError
