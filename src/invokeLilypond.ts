@@ -42,7 +42,7 @@ export type StrictLilypondOpts = {
    *
    * @default `lilypond.exe` | USE_ENV
    */
-  binary: string | typeof USE_ENV
+  readonly binary: string | typeof USE_ENV
 
   /**
    * Lilypond document version to use. This value will be written to the
@@ -50,7 +50,7 @@ export type StrictLilypondOpts = {
    *
    * @default 2.24
    */
-  version: string
+  readonly version: string
 
   /**
    * List of formats to render. `svg` cannot be used along with other formats,
@@ -58,14 +58,14 @@ export type StrictLilypondOpts = {
    *
    * @default ['pdf']
    */
-  formats: OutputFormat[]
+  readonly formats: readonly Exclude<OutputFormat, 'svg'>[] | readonly ['svg']
 
   /**
    * Whether to crop the output.
    *
    * @default false
    */
-  crop: boolean
+  readonly crop: boolean
 
   /**
    * DPI of `png` output. If `null`, let Lilypond determine the default (101 as
@@ -73,14 +73,14 @@ export type StrictLilypondOpts = {
    *
    * @default null
    */
-  dpi: number | null
+  readonly dpi: number | null
 
   /**
    * Whether to add a `\midi` block to the score if `wrap` is set.
    *
    * @default false
    */
-  midi: boolean
+  readonly midi: boolean
 
   /**
    * Whether to automatically wrap music expressions in a complete score.
@@ -102,13 +102,19 @@ export type StrictLilypondOpts = {
    *
    * @default true
    */
-  wrap: boolean
+  readonly wrap: boolean
 }
+
+type Mutable<T> = T extends Readonly<Record<string | symbol | number, never>> | readonly unknown[] ? {
+  -readonly [key in keyof T]: Mutable<T[key]>
+} : T;
 
 /**
  * Options for invoking lilypond. For external use.
  */
-export type LilypondOpts = Partial<StrictLilypondOpts>
+export type LilypondOpts = {
+  -readonly [key in keyof StrictLilypondOpts]?: Mutable<StrictLilypondOpts[key]>;
+}
 
 /**
  * The output files of a lilypond invocation, as a record of filetypes and
@@ -127,7 +133,7 @@ export type LilypondResults = {
  * These choices intend to reflect 'standard' lilypond usage. Some will be
  * overridden by the plugin options.
  */
-const defaults = {
+const defaults: StrictLilypondOpts = {
   binary: process.platform === 'win32' ? 'lilypond.exe' : USE_ENV,
   version: '2.22.1',
   formats: ['pdf'],
@@ -135,27 +141,19 @@ const defaults = {
   dpi: null,
   midi: false,
   wrap: false,
-} as const satisfies StrictLilypondOpts
+}
 
 /**
  * Invoke lilypond.
  *
  * @return The resulting outputs
  */
-export async function invokeLilypond<Formats extends readonly OutputFormat[]>(
+export async function invokeLilypond<Formats extends Readonly<StrictLilypondOpts['formats']>>(
   music: string,
   opts?: LilypondOpts & { formats: Formats },
 ): Promise<
   LilypondResults & {
     outputs: Record<Formats[number], Buffer>
-  }
->
-export async function invokeLilypond(
-  music: string,
-  opts?: Omit<LilypondOpts, 'formats'> & { formats?: never },
-): Promise<
-  LilypondResults & {
-    outputs: Record<(typeof defaults)['formats'][number], Buffer>
   }
 >
 export async function invokeLilypond(
@@ -166,7 +164,7 @@ export async function invokeLilypond(
   music: string,
   opts?: LilypondOpts,
 ): Promise<LilypondResults> {
-  const fullOpts: StrictLilypondOpts = {
+  const fullOpts: unknown = {
     ...defaults,
     ...(opts ?? {}),
   }
