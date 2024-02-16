@@ -13,17 +13,26 @@ import { wrapMusic, computeArgs, validateOptions } from './lilypondUtil'
 import { fromEntries } from './util'
 
 /**
- * The format of the (main) output file or files. Possible values for format are ps, pdf, png or svg.
+ * The format of the (main) output file or files. Possible values for format
+ * are ps, pdf, png or svg.
  *
- * SVG internally uses a specific backend, and therefore cannot be obtained in the same run as other formats; using -fsvg or --svg is actually equivalent to using the -dbackend=svg option. See Advanced command line options for LilyPond.
+ * SVG internally uses a specific backend, and therefore cannot be obtained in
+ * the same run as other formats; using -fsvg or --svg is actually equivalent
+ * to using the -dbackend=svg option. See Advanced command line options for
+ * LilyPond.
  *
  * @see {@link https://lilypond.org/doc/v2.24/Documentation/usage/command_002dline-usage#basic-command-line-options-for-lilypond | Lilypond Docs}
  */
 export const outputFormats = ['ps', 'pdf', 'png', 'svg'] as const
+
 /**
- * The format of the (main) output file or files. Possible values for format are ps, pdf, png or svg.
+ * The format of the (main) output file or files. Possible values for format
+ * are ps, pdf, png or svg.
  *
- * SVG internally uses a specific backend, and therefore cannot be obtained in the same run as other formats; using -fsvg or --svg is actually equivalent to using the -dbackend=svg option. See Advanced command line options for LilyPond.
+ * SVG internally uses a specific backend, and therefore cannot be obtained in
+ * the same run as other formats; using -fsvg or --svg is actually equivalent
+ * to using the -dbackend=svg option. See Advanced command line options for
+ * LilyPond.
  *
  * @see {@link https://lilypond.org/doc/v2.24/Documentation/usage/command_002dline-usage#basic-command-line-options-for-lilypond | Lilypond Docs}
  */
@@ -38,7 +47,8 @@ export type StrictLilypondOpts = {
   /**
    * Lilypond binary to invoke
    *
-   * Default to {@link USE_ENV} for POSIX systems, and `lilypond.exe` on Windows systems.
+   * Default to {@link USE_ENV} for POSIX systems, and `lilypond.exe` on
+   * Windows systems.
    *
    * @default `lilypond.exe` | USE_ENV
    */
