@@ -36,7 +36,8 @@
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "docs": "typedoc",
-    "docs:watch": "typedoc --watch"
+    "docs:watch": "typedoc --watch",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
