@@ -3,7 +3,7 @@ import type { StrictLilypondOpts } from '../src/invokeLilypond'
 import { describe, it, expect } from '@jest/globals'
 import { wrapMusic, validateOptions, computeArgs } from '../src/lilypondUtil'
 import { multiline } from '../src/util'
-import { music, binary, opts, file } from './values'
+import { music, opts, outputPath } from './values'
 
 describe('Lilypond utilities', () => {
   describe(wrapMusic, () => {
@@ -113,24 +113,6 @@ describe('Lilypond utilities', () => {
       expect(test).not.toThrow()
     })
 
-    it('fails with formats as PS', () => {
-      const test = () =>
-        validateOptions({
-          ...opts,
-          formats: ['eps'],
-        })
-      expect(test).toThrow('eps format is not supported')
-    })
-
-    it('fails with formats as EPS', () => {
-      const test = () =>
-        validateOptions({
-          ...opts,
-          formats: ['eps'],
-        })
-      expect(test).toThrow('eps format is not supported')
-    })
-
     it('fails with formats as SVG and PDF ', () => {
       const test = () =>
         validateOptions({
@@ -138,7 +120,7 @@ describe('Lilypond utilities', () => {
           formats: ['svg', 'pdf'],
         })
       const expected =
-        'Cannot generate svg at the same time as other graphical formats (asked to generate svg, pdf)'
+        'Invalid value at formats, expected ["svg"] | array<"pdf" | "png">, got array<"svg" | "pdf">'
       expect(test).toThrowError(expected)
     })
   })
@@ -147,8 +129,8 @@ describe('Lilypond utilities', () => {
     type Test = {
       name: string
       opts: StrictLilypondOpts
-      file: string
-      expected: string
+      outputPath: string
+      expected: string[]
     }
 
     const tests: Test[] = [
@@ -158,8 +140,11 @@ describe('Lilypond utilities', () => {
           ...opts,
           formats: ['svg'],
         },
-        file,
-        expected: `${binary} --format=svg --define-default=no-point-and-click ${file}`,
+        outputPath,
+        expected:
+          `--format=svg --define-default=no-point-and-click --output="score" -`.split(
+            ' ',
+          ),
       },
 
       {
@@ -169,19 +154,25 @@ describe('Lilypond utilities', () => {
           formats: ['svg'],
           midi: true,
         },
-        file,
-        expected: `${binary} --format=svg --define-default=no-point-and-click ${file}`,
+        outputPath,
+        expected:
+          `--format=svg --define-default=no-point-and-click --output="score" -`.split(
+            ' ',
+          ),
       },
 
       {
-        name: 'PDF, PS, and MIDI',
+        name: 'PDF, PNG, and MIDI',
         opts: {
           ...opts,
-          formats: ['pdf', 'ps'],
+          formats: ['pdf', 'png'],
           midi: true,
         },
-        file,
-        expected: `${binary} --format=pdf --format=ps --define-default=no-point-and-click ${file}`,
+        outputPath,
+        expected:
+          `--format=pdf --format=png --define-default=no-point-and-click --output="score" -`.split(
+            ' ',
+          ),
       },
 
       {
@@ -191,15 +182,16 @@ describe('Lilypond utilities', () => {
           formats: [],
           midi: true,
         },
-        file,
-        expected: `${binary} --define-default=no-point-and-click ${file}`,
+        outputPath,
+        expected:
+          `--define-default=no-point-and-click --output="score" -`.split(' '),
       },
     ]
 
     it.each(tests)(
       'generates expected command line for $name',
-      ({ opts, file, expected }) => {
-        expect(computeArgs(opts, file)).toEqual(expected)
+      ({ opts, outputPath, expected }) => {
+        expect(computeArgs(opts, outputPath)).toEqual(expected)
       },
     )
   })

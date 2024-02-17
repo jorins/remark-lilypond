@@ -4,6 +4,12 @@
  */
 
 import type { StrictLilypondOpts } from '../src/invokeLilypond'
+import { USE_ENV_BINARY } from '../src/const'
+
+const binary =
+  process.env['LILYPOND_BIN'] === undefined
+    ? USE_ENV_BINARY
+    : process.env['LILYPOND_BIN']
 
 export const score = `\\version "2.24"
 
@@ -16,7 +22,6 @@ export const score = `\\version "2.24"
 }`
 
 export const music = `d4 e f g`
-export const binary = '/usr/bin/env lilypond'
 export const version = '2.24'
 export const opts: StrictLilypondOpts = {
   binary,
@@ -27,4 +32,4 @@ export const opts: StrictLilypondOpts = {
   formats: [],
   dpi: null,
 }
-export const file = '/tmp/lilypond-123456/score.ly'
+export const outputPath = '"score"'
