@@ -72,7 +72,7 @@ export type StrictLilypondOpts = {
    * LilyPond document version to use. This value will be written to the
    * `\\version` at the top of the score if `wrap` is true.
    *
-   * @default 2.24
+   * @default 2.22
    */
   readonly version: string
 

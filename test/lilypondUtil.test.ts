@@ -10,7 +10,7 @@ describe('LilyPond utilities', () => {
     it('wraps in a score without outputs when no format is given MIDI is not requested', () => {
       const res = wrapMusic(music, { ...opts, formats: [], midi: false })
       expect(res).toEqual(
-        multiline(`\\version "2.24"`, `\\score {`, `  { ${music} }`, `}`),
+        multiline(`\\version "2.22"`, `\\score {`, `  { ${music} }`, `}`),
       )
     })
 
@@ -18,7 +18,7 @@ describe('LilyPond utilities', () => {
       const res = wrapMusic(music, { ...opts, formats: ['pdf'], midi: false })
       expect(res).toEqual(
         multiline(
-          `\\version "2.24"`,
+          `\\version "2.22"`,
           `\\score {`,
           `  { ${music} }`,
           `  \\layout { }`,
@@ -35,7 +35,7 @@ describe('LilyPond utilities', () => {
       })
       expect(res).toEqual(
         multiline(
-          `\\version "2.24"`,
+          `\\version "2.22"`,
           `\\score {`,
           `  { ${music} }`,
           `  \\layout { }`,
@@ -48,7 +48,7 @@ describe('LilyPond utilities', () => {
       const res = wrapMusic(music, { ...opts, formats: [], midi: true })
       expect(res).toEqual(
         multiline(
-          `\\version "2.24"`,
+          `\\version "2.22"`,
           `\\score {`,
           `  { ${music} }`,
           `  \\midi { }`,
@@ -61,7 +61,7 @@ describe('LilyPond utilities', () => {
       const res = wrapMusic(music, { ...opts, formats: ['pdf'], midi: true })
       expect(res).toEqual(
         multiline(
-          `\\version "2.24"`,
+          `\\version "2.22"`,
           `\\score {`,
           `  { ${music} }`,
           `  \\layout { }`,
