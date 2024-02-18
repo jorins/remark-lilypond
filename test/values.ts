@@ -4,12 +4,15 @@
  */
 
 import type { StrictLilypondOpts } from '../src/invokeLilypond'
-import { WIN32_DEFAULT_PATH, ENV_PATH } from '../src/const'
+import { WIN32_DEFAULT_PATH, ENV_PATH, USE_ENV_BINARY } from '../src/const'
 
-const defaultBinary =
+export const defaultBinary =
   process.platform === 'win32' ? WIN32_DEFAULT_PATH : ENV_PATH
 
-const binary = process.env['LILYPOND_BIN'] ?? defaultBinary
+export const binary =
+  process.env['LILYPOND_BIN'] ?? process.platform === 'win32'
+    ? WIN32_DEFAULT_PATH
+    : USE_ENV_BINARY
 
 export const version = '2.22'
 export const music = `d4 e f g`

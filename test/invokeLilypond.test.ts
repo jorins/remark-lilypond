@@ -6,7 +6,7 @@ import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
 import { invokeLilypond } from '../src/invokeLilypond'
 import { exec } from '../src/util'
 import { music, score, opts, binary } from './values'
-import { FILENAME, ENV_PATH } from '../src/const'
+import { FILENAME, ENV_PATH, USE_ENV_BINARY } from '../src/const'
 
 const scoreDir = mkdtemp(join(tmpdir(), 'lilypondTest-'))
 
@@ -20,10 +20,11 @@ beforeAll(async () => {
   // Build reference scores
   const scorePath = await filePath()
 
-  const lilypondArg = binary === ENV_PATH ? ['lilypond'] : []
+  const [binaryPath, lilypondArg] =
+    binary === USE_ENV_BINARY ? [ENV_PATH, ['lilypond']] : [binary, []]
 
   await exec(
-    binary,
+    binaryPath,
     [
       ...lilypondArg,
       '--format=png',
@@ -37,7 +38,7 @@ beforeAll(async () => {
   )
 
   await exec(
-    binary,
+    binaryPath,
     [
       ...lilypondArg,
       '--format=svg',
