@@ -1,0 +1,13 @@
+name: Push to dev branch
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'dev'
+    tags-ignore:
+      - '*'
+
+jobs:
+  ci-package:
+    uses: './.github/workflows/ci-package.yml'

@@ -1,0 +1,90 @@
+name: Build and test package
+
+on:
+  workflow_call:
+
+env:
+  BUILD_ARTIFACT_NAME: build
+  BUILD_ARTIFACT_PATH: dist
+  COVERAGE_ARTIFACT_NAME: coverage
+  COVERAGE_ARTIFACT_PATH: coverage
+
+jobs:
+  format:
+    name: Check formatter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: './.github/actions/setup-pnpm'
+
+      - name: Run formatter
+        run: pnpm format
+
+  lint:
+    name: Check linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: './.github/actions/setup-pnpm'
+
+      - name: Run linter
+        run: pnpm lint
+
+  test:
+    name: Run tests
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    outputs:
+      artifact-name: ${{ env.COVERAGE_ARTIFACT_NAME }}
+      artifact-path: ${{ env.COVERAGE_ARTIFACT_PATH }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: './.github/actions/setup-pnpm'
+
+      - name: Set up LilyPond
+        uses: './.github/actions/install-lilypond'
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.COVERAGE_ARTIFACT_NAME }}
+          path: ${{ env.COVERAGE_ARTIFACT_PATH }}
+
+  build:
+    name: Build project
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ env.BUILD_ARTIFACT_NAME }}
+      artifact-path: ${{ env.BUILD_ARTIFACT_PATH }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: './.github/actions/setup-pnpm'
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_ARTIFACT_NAME }}
+          path: ${{ env.BUILD_ARTIFACT_PATH }}

@@ -1,0 +1,28 @@
+name: Build docs site
+
+on:
+  workflow_call:
+
+env:
+  DOCS_ARTIFACT_PATH: doc
+
+jobs:
+  build:
+    name: Build docs
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-path: ${{ env.DOCS_ARTIFACT_PATH }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: './.github/actions/setup-pnpm'
+
+      - name: Build docs
+        run: pnpm run docs
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact
+        with:
+          path: ${{ env.DOCS_ARTIFACT_PATH }}

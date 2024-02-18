@@ -1,0 +1,21 @@
+name: Install Lilypond
+description: Cross platform installation of Lilypond (Linux assumed to be Ubuntu)
+
+runs:
+  using: composite
+  steps:
+    - if: ${{ runner.os == 'Linux' }}
+      shell: sh
+      run: |
+        sudo apt update
+        sudo apt install lilypond
+
+    - if: ${{ runner.os == 'macOS' }}
+      shell: sh
+      run: |
+        brew update
+        brew install lilypond
+
+    - if: ${{ runner.os == 'Windows' }}
+      shell: pwsh
+      run: choco install lilypond

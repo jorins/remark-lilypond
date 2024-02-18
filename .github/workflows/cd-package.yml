@@ -1,0 +1,44 @@
+name: Deploy package
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: Environment being published to
+        required: true
+        type: string
+
+      build-artifact-name:
+        description: Name of build artifact
+        required: true
+        type: string
+
+      build-artifact-path:
+        description: Path of build artifact
+        required: true
+        type: string
+
+    secrets:
+      npm-auth-token:
+        description: Authentication token for npmjs
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy package
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.build-artifact-name }}
+          path: ${{ inputs.build-artifact-path }}
+
+      - name: Publish package
+        run: pnpm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm-auth-token }}
