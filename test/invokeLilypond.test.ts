@@ -14,6 +14,8 @@ async function filePath(...postfix: string[]): Promise<string> {
   return join(await scoreDir, [FILENAME, ...postfix].join('.'))
 }
 
+const MINUTE = 60 * 1000
+
 beforeAll(async () => {
   // Build reference scores
   const scorePath = await filePath()
@@ -50,7 +52,7 @@ beforeAll(async () => {
     undefined,
     score,
   )
-})
+}, MINUTE)
 
 afterAll(async () => {
   return rm(await scoreDir, { recursive: true })
