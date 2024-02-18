@@ -8,15 +8,15 @@ on:
 
 jobs:
   ci-package:
-    uses: './.github/workflows/ci-package.yml'
+    uses: ./.github/workflows/ci-package.yml
 
   ci-docs:
-    uses: './.github/workflows/ci-docs.yml'
+    uses: ./.github/workflows/ci-docs.yml
 
   cd-package:
-    uses: './.github/workflows/cd-package.yml'
     needs: ci-package
+    uses: ./.github/workflows/cd-package.yml
 
   cd-docs:
-    uses: './.github/workflows/cd-docs.yml'
     needs: ci-docs
+    uses: ./.github/workflows/cd-docs.yml

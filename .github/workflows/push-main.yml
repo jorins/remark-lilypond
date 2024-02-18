@@ -10,7 +10,7 @@ on:
 
 jobs:
   ci-package:
-    uses: './.github/workflows/ci-package.yml'
+    uses: ./.github/workflows/ci-package.yml
 
   ci-docs:
-    uses: './.github/workflows/ci-docs.yml'
+    uses: ./.github/workflows/ci-docs.yml
