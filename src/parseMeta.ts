@@ -48,7 +48,7 @@ export function parseMeta(meta: string): Partial<RemarkLilypondConfig> {
         break
 
       default:
-        console.warn(`Unhandled Lilypond option '${opt}'`)
+        console.warn(`Unhandled LilyPond option '${opt}'`)
     }
   }
 

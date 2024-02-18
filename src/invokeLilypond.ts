@@ -1,6 +1,6 @@
 /**
  * @module
- * Library for invoking lilypond
+ * Library for invoking LilyPond
  */
 
 import type { Mutable } from './util'
@@ -133,14 +133,14 @@ export type StrictLilypondOpts = {
 }
 
 /**
- * Options for invoking lilypond. For external use.
+ * Options for invoking LilyPond. For external use.
  */
 export type LilypondOpts = {
   -readonly [key in keyof StrictLilypondOpts]?: Mutable<StrictLilypondOpts[key]>
 }
 
 /**
- * The output files of a lilypond invocation, as a record of filetypes and
+ * The output files of a LilyPond invocation, as a record of filetypes and
  * buffers in addition to the CLI's stdout and stderr.
  */
 export type LilypondResults<Formats extends FormatCombination> = {
@@ -151,9 +151,9 @@ export type LilypondResults<Formats extends FormatCombination> = {
 }
 
 /**
- * Default Lilypond options.
+ * Default LilyPond options.
  *
- * These choices intend to reflect 'standard' lilypond usage. Some will be
+ * These choices intend to reflect 'standard' LilyPond usage. Some will be
  * overridden by the plugin options.
  */
 const defaults: StrictLilypondOpts = {

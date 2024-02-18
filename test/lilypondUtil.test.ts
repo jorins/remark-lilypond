@@ -5,7 +5,7 @@ import { wrapMusic, validateOptions, computeArgs } from '../src/lilypondUtil'
 import { multiline } from '../src/util'
 import { music, opts, outputPath } from './values'
 
-describe('Lilypond utilities', () => {
+describe('LilyPond utilities', () => {
   describe(wrapMusic, () => {
     it('wraps in a score without outputs when no format is given MIDI is not requested', () => {
       const res = wrapMusic(music, { ...opts, formats: [], midi: false })

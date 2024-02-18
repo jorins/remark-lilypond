@@ -20,7 +20,7 @@ describe(parseMeta, () => {
   })
 
   it('passes through binary value', () => {
-    const binary = '/home/jorin/Lilypond/lilypond'
+    const binary = '/home/jorin/LilyPond/lilypond'
     expect(parseMeta(`binary=${binary}`)).toEqual({ binary })
   })
 
@@ -50,7 +50,7 @@ describe(parseMeta, () => {
     const key = 'unhandled'
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
     parseMeta(key)
-    expect(warn).toBeCalledWith(`Unhandled Lilypond option '${key}'`)
+    expect(warn).toBeCalledWith(`Unhandled LilyPond option '${key}'`)
   })
 
   it('handles multiple options', () => {

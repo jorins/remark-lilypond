@@ -1,5 +1,5 @@
-name: Install Lilypond
-description: Cross platform installation of Lilypond (Linux assumed to be Ubuntu)
+name: Install LilyPond
+description: Cross platform installation of LilyPond (Linux assumed to be Ubuntu)
 
 runs:
   using: composite
