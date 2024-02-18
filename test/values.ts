@@ -11,18 +11,18 @@ const binary =
     ? USE_ENV_BINARY
     : process.env['LILYPOND_BIN']
 
-export const score = `\\version "2.24"
+export const version = '2.22'
+export const music = `d4 e f g`
+export const score = `\\version "${version}"
 
 \\score {
   {
-    d4 e f g
+    ${music}
   }
   \\layout { }
   \\midi { }
 }`
 
-export const music = `d4 e f g`
-export const version = '2.22'
 export const opts: StrictLilypondOpts = {
   binary,
   version,
