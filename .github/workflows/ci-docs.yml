@@ -23,6 +23,6 @@ jobs:
         run: pnpm run docs
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ env.DOCS_ARTIFACT_PATH }}

@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up pnpm
-        uses: './.github/actions/setup-pnpm'
+        uses: ./.github/actions/setup-pnpm
 
       - name: Run formatter
         run: pnpm format
@@ -47,7 +47,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up pnpm
-        uses: './.github/actions/setup-pnpm'
+        uses: ./.github/actions/setup-pnpm
 
       - name: Run linter
         run: pnpm lint
@@ -69,10 +69,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up pnpm
-        uses: './.github/actions/setup-pnpm'
+        uses: ./.github/actions/setup-pnpm
 
       - name: Set up LilyPond
-        uses: './.github/actions/install-lilypond'
+        uses: ./.github/actions/install-lilypond
 
       - name: Run tests
         run: pnpm test
@@ -94,7 +94,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up pnpm
-        uses: './.github/actions/setup-pnpm'
+        uses: ./.github/actions/setup-pnpm
 
       - name: Build project
         run: pnpm build
