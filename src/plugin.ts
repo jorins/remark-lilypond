@@ -1,12 +1,13 @@
 import type { Plugin, Transformer } from 'unified'
 import type { Root, Parent, Code } from 'mdast'
-import type { LilypondOpts, OutputFormat } from './invokeLilypond'
+import type { LilypondOpts } from './invokeLilypond'
 
 import { visit } from 'unist-util-visit'
+import { Program } from 'estree'
 import { invokeLilypond } from './invokeLilypond'
 import { parseMeta } from './parseMeta'
+import { dataUri } from './util'
 import { svgToHast } from './svgToHast'
-import { Program } from 'estree'
 
 declare module 'mdast' {
   export interface RootContentMap {
@@ -62,15 +63,6 @@ const defaultConfig: RemarkLilypondConfig = {
   crop: true,
   midi: true,
   dpi: 72,
-}
-
-const mimeTypeMap = {
-  ps: 'application/postscript',
-  pdf: 'application/pdf',
-  png: 'image/png',
-  svg: 'image/svg+xml',
-} as const satisfies {
-  [key in OutputFormat]: string
 }
 
 /**
@@ -136,7 +128,7 @@ export const remarkLilypond: Plugin<
       if (snippetConfig.strategy === 'inline-svg') {
         parent.children[index] = svgToHast(outputBinary)
       } else {
-        const uri = `data:${mimeTypeMap[format]};base64,${outputBinary.toString('base64')}`
+        const uri = dataUri(format, outputBinary)
         parent.children[index] = {
           type: 'mdxJsxFlowElement',
           name: 'img',

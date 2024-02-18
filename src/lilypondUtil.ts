@@ -3,12 +3,10 @@
  * Utilities surrounding lilypond
  */
 
-import {
-  USE_ENV,
-  type StrictLilypondOpts,
-  outputFormats,
-  OutputFormat,
-} from './invokeLilypond'
+import type { StrictLilypondOpts, OutputFormat } from './invokeLilypond'
+
+import { outputFormats } from './invokeLilypond'
+import { USE_ENV_BINARY } from './const'
 import {
   ErrorCtors,
   InvalidValueError,
@@ -109,7 +107,7 @@ export function validateOptions(
   assertType(
     opts,
     {
-      binary: union('string', USE_ENV),
+      binary: union('string', USE_ENV_BINARY),
       version: 'string',
       formats: assertValidFormats,
       crop: 'boolean',
@@ -146,9 +144,9 @@ export function computeArgs(
     args.push(`--define-default=resolution=${opts.dpi}`)
   }
 
-  args.push(`--output=${outPath}`)
-
   args.push('--define-default=no-point-and-click')
+
+  args.push(`--output=${outPath}`)
 
   args.push('-')
 

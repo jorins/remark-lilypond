@@ -6,15 +6,20 @@ import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
 import { invokeLilypond } from '../src/invokeLilypond'
 import { exec } from '../src/util'
 import { music, score, opts } from './values'
+import { FILENAME, ENV_PATH } from '../src/const'
 
 const scoreDir = mkdtemp(join(tmpdir(), 'lilypondTest-'))
 
+async function filePath(...postfix: string[]): Promise<string> {
+  return join(await scoreDir, [FILENAME, ...postfix].join('.'))
+}
+
 beforeAll(async () => {
   // Build reference scores
-  const scorePath = join(await scoreDir, 'score')
+  const scorePath = await filePath()
 
-  const lilypondBin = process.env['LILYPOND_BIN'] ?? '/usr/bin/env'
-  const lilypondArg = lilypondBin === '/usr/bin/env' ? ['lilypond'] : []
+  const lilypondBin = process.env['LILYPOND_BIN'] ?? ENV_PATH
+  const lilypondArg = lilypondBin === ENV_PATH ? ['lilypond'] : []
 
   await exec(
     lilypondBin,
@@ -51,7 +56,7 @@ afterAll(async () => {
 
 describe(invokeLilypond, () => {
   it('gives the expected png output', async () => {
-    const expectedPath = join(await scoreDir, 'score.png')
+    const expectedPath = await filePath('png')
     const expectedPromise = readFile(expectedPath)
     const invocation = invokeLilypond(music, {
       ...opts,
@@ -67,7 +72,7 @@ describe(invokeLilypond, () => {
   })
 
   it('gives the expected cropped png output', async () => {
-    const expectedPath = join(await scoreDir, 'score.cropped.png')
+    const expectedPath = await filePath('cropped', 'png')
     const expectedPromise = readFile(expectedPath)
     const invocation = invokeLilypond(music, {
       ...opts,
@@ -75,7 +80,7 @@ describe(invokeLilypond, () => {
       crop: true,
     })
 
-    const res = (await invocation).outputs['cropped.png']
+    const res = (await invocation).outputs.png
     const expected = await expectedPromise
 
     expect(res?.length).toEqual(expected.length)
@@ -83,7 +88,7 @@ describe(invokeLilypond, () => {
   })
 
   it('gives the expected svg output', async () => {
-    const expectedPath = join(await scoreDir, 'score.svg')
+    const expectedPath = await filePath('svg')
     const expectedPromise = readFile(expectedPath)
     const invocation = invokeLilypond(music, {
       ...opts,
@@ -99,7 +104,7 @@ describe(invokeLilypond, () => {
   })
 
   it('gives the expected cropped svg output', async () => {
-    const expectedPath = join(await scoreDir, 'score.cropped.svg')
+    const expectedPath = await filePath('cropped', 'svg')
     const expectedPromise = readFile(expectedPath)
     const invocation = invokeLilypond(music, {
       ...opts,
@@ -107,7 +112,7 @@ describe(invokeLilypond, () => {
       crop: true,
     })
 
-    const res = (await invocation).outputs['cropped.svg']
+    const res = (await invocation).outputs.svg
     const expected = await expectedPromise
 
     expect(res?.length).toEqual(expected.length)
@@ -115,7 +120,7 @@ describe(invokeLilypond, () => {
   })
 
   it('gives the expected MIDI output', async () => {
-    const expectedPath = join(await scoreDir, 'score.midi')
+    const expectedPath = await filePath('midi')
     const expectedPromise = readFile(expectedPath)
     const invocation = invokeLilypond(music, {
       ...opts,
@@ -131,7 +136,7 @@ describe(invokeLilypond, () => {
   })
 
   it('handles pre-wrapped input when wrap: false', async () => {
-    const expectedPath = join(await scoreDir, 'score.svg')
+    const expectedPath = await filePath('svg')
     const expectedPromise = readFile(expectedPath)
     const invocation = invokeLilypond(score, {
       ...opts,
