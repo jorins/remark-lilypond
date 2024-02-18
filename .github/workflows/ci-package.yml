@@ -2,6 +2,22 @@ name: Build and test package
 
 on:
   workflow_call:
+    outputs:
+      build-artifact-name:
+        description: Name of the package build artifact
+        value: ${{ jobs.build.outputs.artifact-name }}
+
+      build-artifact-path:
+        description: Path of the package build artifact
+        value: ${{ jobs.build.outputs.artifact-path }}
+
+      coverage-artifact-name:
+        description: Name of the coverage artifact
+        value: ${{ jobs.test.outputs.artifact-name }}
+
+      coverage-artifact-path:
+        description: Path of the coverage artifact
+        value: ${{ jobs.test.outputs.artifact-path }}
 
 env:
   BUILD_ARTIFACT_NAME: build

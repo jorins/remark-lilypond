@@ -1,5 +1,9 @@
 name: Release published
 
+env:
+  package-env: release
+  docs-env: github-pages
+
 on:
   workflow_dispatch:
   release:
@@ -16,6 +20,12 @@ jobs:
   cd-package:
     needs: ci-package
     uses: ./.github/workflows/cd-package.yml
+    with:
+      environment: ${{ env.package-env }}
+      build-artifact-name: ${{ jobs.ci-package.outputs.build-artifact-name }}
+      build-artifact-path: ${{ jobs.ci-package.outputs.build-artifact-path }}
+    secrets:
+      npm-auth-token: ${{ secrets.npm-auth-token }}
 
   cd-docs:
     needs: ci-docs

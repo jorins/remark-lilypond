@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up pnpm
-        uses: './.github/actions/setup-pnpm'
+        uses: ./.github/actions/setup-pnpm
 
       - name: Build docs
         run: pnpm run docs
