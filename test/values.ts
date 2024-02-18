@@ -22,7 +22,7 @@ export const score = `\\version "2.24"
 }`
 
 export const music = `d4 e f g`
-export const version = '2.24'
+export const version = '2.22'
 export const opts: StrictLilypondOpts = {
   binary,
   version,
