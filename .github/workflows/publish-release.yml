@@ -5,7 +5,7 @@ env:
   docs-env: github-pages
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # FIXME: test trigger, to be removed
   release:
     types:
       - published
