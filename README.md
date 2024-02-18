@@ -14,4 +14,4 @@ vulnerabilities. Only use this plugin with inputs written by people you trust.
 
 - [GitHub repository](https://github.com/jorins/remark-lilypond)
 - [npmjs.com package](https://www.npmjs.com/package/remark-lilypond)
-- Documentation -- TODO
+- [Documentation](https://jorins.github.io/remark-lilypond/)
