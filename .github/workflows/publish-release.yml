@@ -6,10 +6,6 @@ on:
     types:
       - published
 
-env:
-  PACKAGE_ENV: release
-  DOCS_ENV: github-pages
-
 jobs:
   ci-package:
     name: Package CI
@@ -24,7 +20,7 @@ jobs:
     needs: ci-package
     uses: ./.github/workflows/cd-package.yml
     with:
-      environment: ${{ env.PACKAGE_ENV }}
+      environment: release
       build-artifact-name: ${{ needs.ci-package.outputs.build-artifact-name }}
       build-artifact-path: ${{ needs.ci-package.outputs.build-artifact-path }}
     secrets:
@@ -35,4 +31,4 @@ jobs:
     needs: ci-docs
     uses: ./.github/workflows/cd-docs.yml
     with:
-      environment: ${{ env.DOCS_ENV }}
+      environment: github-pages
