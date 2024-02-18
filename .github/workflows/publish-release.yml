@@ -1,4 +1,4 @@
-name: Release published
+name: Trigger - Release published
 
 on:
   workflow_dispatch: # FIXME: test trigger, to be removed

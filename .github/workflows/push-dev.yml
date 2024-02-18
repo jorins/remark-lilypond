@@ -1,4 +1,4 @@
-name: Push to dev branch
+name: Trigger - Push to dev branch
 
 on:
   workflow_dispatch: # FIXME: test trigger, to be removed

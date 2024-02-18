@@ -1,4 +1,4 @@
-name: Build docs site
+name: CI - Docs
 
 on:
   workflow_call:

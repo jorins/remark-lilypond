@@ -1,4 +1,4 @@
-name: Build and test package
+name: CI - Package
 
 on:
   workflow_call:

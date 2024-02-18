@@ -1,4 +1,4 @@
-name: Deploy package
+name: CD - Package
 
 on:
   workflow_call:

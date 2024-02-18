@@ -1,4 +1,4 @@
-name: Deploy docs
+name: CD - Docs
 
 on:
   workflow_call:
