@@ -2,6 +2,11 @@ name: Deploy docs
 
 on:
   workflow_call:
+    inputs:
+      environment:
+        description: GitHub environment to use
+        required: true
+        type: string
 
 jobs:
   deploy:

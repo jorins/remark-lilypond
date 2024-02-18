@@ -1,14 +1,14 @@
 name: Release published
 
-env:
-  package-env: release
-  docs-env: github-pages
-
 on:
   workflow_dispatch: # FIXME: test trigger, to be removed
   release:
     types:
       - published
+
+env:
+  PACKAGE_ENV: release
+  DOCS_ENV: github-pages
 
 jobs:
   ci-package:
@@ -24,9 +24,9 @@ jobs:
     needs: ci-package
     uses: ./.github/workflows/cd-package.yml
     with:
-      environment: ${{ env.package-env }}
-      build-artifact-name: ${{ jobs.ci-package.outputs.build-artifact-name }}
-      build-artifact-path: ${{ jobs.ci-package.outputs.build-artifact-path }}
+      environment: ${{ env.PACKAGE_ENV }}
+      build-artifact-name: ${{ needs.ci-package.outputs.build-artifact-name }}
+      build-artifact-path: ${{ needs.ci-package.outputs.build-artifact-path }}
     secrets:
       npm-auth-token: ${{ secrets.npm-auth-token }}
 
@@ -34,3 +34,5 @@ jobs:
     name: Docs CD
     needs: ci-docs
     uses: ./.github/workflows/cd-docs.yml
+    with:
+      environment: ${{ env.DOCS_ENV }}
