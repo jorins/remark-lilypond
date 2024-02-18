@@ -20,6 +20,7 @@ jobs:
     uses: ./.github/workflows/ci-docs.yml
 
   cd-package:
+    name: Package CD
     needs: ci-package
     uses: ./.github/workflows/cd-package.yml
     with:
@@ -30,5 +31,6 @@ jobs:
       npm-auth-token: ${{ secrets.npm-auth-token }}
 
   cd-docs:
+    name: Docs CD
     needs: ci-docs
     uses: ./.github/workflows/cd-docs.yml
