@@ -10,7 +10,9 @@ on:
 
 jobs:
   ci-package:
+    name: Package CI
     uses: ./.github/workflows/ci-package.yml
 
   ci-docs:
+    name: Docs CI
     uses: ./.github/workflows/ci-docs.yml
