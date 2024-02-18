@@ -29,6 +29,9 @@ jobs:
   cd-docs:
     name: Docs CD
     needs: ci-docs
+    permissions:
+      pages: write
+      id-token: write
     uses: ./.github/workflows/cd-docs.yml
     with:
       environment: github-pages
