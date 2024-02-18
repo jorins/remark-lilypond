@@ -59,6 +59,7 @@ jobs:
       matrix:
         os:
           # TODO: fix and reintroduce Windows testing
+          # See https://github.com/jorins/remark-lilypond/issues/12
           # - windows-latest
           - ubuntu-latest
     runs-on: ${{ matrix.os }}
