@@ -1,0 +1,9 @@
+name: Trigger - Pull request
+
+on:
+  pull_request:
+
+jobs:
+  ci-package:
+    name: Package CI
+    uses: ./.github/workflows/ci-package.yml
