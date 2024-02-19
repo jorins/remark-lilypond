@@ -41,7 +41,10 @@ jobs:
           name: ${{ inputs.build-artifact-name }}
           path: ${{ inputs.build-artifact-path }}
 
+      - name: Write auth token to config
+        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+
       - name: Publish package
         run: pnpm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
