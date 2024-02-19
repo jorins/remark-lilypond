@@ -19,7 +19,7 @@ on:
         type: string
 
     secrets:
-      npm-auth-token:
+      NPM_AUTH_TOKEN:
         description: Authentication token for npmjs
         required: true
 
@@ -44,4 +44,4 @@ jobs:
       - name: Publish package
         run: pnpm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm-auth-token }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

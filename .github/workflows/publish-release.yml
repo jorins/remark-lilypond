@@ -24,7 +24,7 @@ jobs:
       build-artifact-name: ${{ needs.ci-package.outputs.build-artifact-name }}
       build-artifact-path: ${{ needs.ci-package.outputs.build-artifact-path }}
     secrets:
-      npm-auth-token: ${{ secrets.npm-auth-token }}
+      npm-auth-token: ${{ secrets.NPM_AUTH_TOKEN }}
 
   cd-docs:
     name: Docs CD
