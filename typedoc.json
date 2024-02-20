@@ -1,5 +1,16 @@
 {
   "$schema": "https://typedoc.org/schema.json",
+  "name": "Remark LilyPond",
   "entryPoints": ["./src/index.ts"],
-  "out": "doc"
+  "media": "media",
+  "out": "doc",
+
+  "navigationLinks": {
+    "Package": "https://www.npmjs.com/package/remark-lilypond",
+    "Source": "https://github.com/jorins/remark-lilypond"
+  },
+
+  "sidebarLinks": {
+    "Project README": "https://jorins.github.io/remark-lilypond"
+  }
 }
